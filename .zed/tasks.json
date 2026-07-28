@@ -1,0 +1,26 @@
+[
+  {
+    "label": "Launch",
+    "command": "./.venv/bin/python -m shovl",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+  },
+  {
+    "label": "Launch with env file",
+    "command": "./.venv/bin/python -m shovl --env .env",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+  },
+  {
+    "label": "Test",
+    "command": "./.venv/bin/python -m unittest discover -s tests -p '*_test.py'",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+  },
+  {
+    "label": "Logs",
+    "command": "tail -f ~/.shovl.log",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+  },
+]

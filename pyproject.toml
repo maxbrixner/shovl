@@ -1,0 +1,108 @@
+[build-system]
+requires = ["setuptools>=80.10.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shovl"
+version = "0.2.7"
+authors = [
+  { name="Max Brixner" },
+]
+description = "A lightweight terminal-based database and S3 client built with Textual."
+readme = "README.md"
+requires-python = ">=3.12.9"
+license = { file = "LICENSE.md" }
+keywords = ["database", "AWS", "S3", "terminal", "TUI", "textual", "sqlalchemy", "boto3"]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent"
+]
+
+dependencies = [
+    "textual>=0.41.0",
+    "textual[syntax]>=0.41.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.2.1",
+    "typer>=0.21.1",
+]
+
+[project.urls]
+Source = "https://codeberg.org/maxbrixner/shovl"
+Issues = "https://codeberg.org/maxbrixner/shovl/issues"
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.4.0",
+  "setuptools>=80.10.2",
+  "twine>=6.2.0",
+]
+database = [
+    "sqlalchemy>=2.0.0",
+]
+bucket = [
+    "boto3>=1.42.44",
+]
+sqlite = [
+    "sqlalchemy>=2.0.0",
+]
+postgresql = [
+    "psycopg2-binary>=2.9.11",
+    "sqlalchemy>=2.0.0",
+]
+oracle = [
+    "oracledb>=3.4.2",
+    "sqlalchemy>=2.0.0",
+]
+mysql = [
+    "PyMySQL>=1.1.2",
+    "sqlalchemy>=2.0.0",
+]
+snowflake = [
+    "snowflake-sqlalchemy>=1.8.2",
+    "sqlalchemy>=2.0.0",
+]
+duckdb = [
+    "duckdb>=1.4.4",
+    "sqlalchemy>=2.0.0",
+]
+ibmdb = [
+    "ibm-db-sa>=0.4.3",
+    "sqlalchemy>=2.0.0",
+]
+all = [
+    "sqlalchemy>=2.0.0",
+    "boto3>=1.42.44",
+    "psycopg2-binary>=2.9.11",
+    "oracledb>=3.4.2",
+    "PyMySQL>=1.1.0",
+    "snowflake-sqlalchemy>=1.5.0",
+    "duckdb>=0.9.0",
+    "ibm-db-sa>=0.4.3",
+]
+
+[project.scripts]
+shovl = "shovl.__main__:main"
+
+[tool.setuptools]
+packages = {find = {include = ["shovl*"]}}
+
+[tool.setuptools.package-data]
+"*" = ["*.tcss"]
+
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+select = [
+    "F",    # Pyflakes (Defaults)
+    "E",    # pycodestyle errors (Defaults)
+    "ANN",  # flake8-annotations (Your addition)
+    "I",    # isort (Keeps imports tidy)
+    "W",    # pycodestyle warnings
+]

@@ -1,0 +1,13 @@
+.venv
+.env
+__pycache__/
+.ruff_cache/
+build/
+*.egg-info/
+dist/
+*.log
+*.db
+.shovl
+.shovl.log
+.shovl.env
+*.sql

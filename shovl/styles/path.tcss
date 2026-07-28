@@ -1,0 +1,30 @@
+PathScreen {
+    align: center middle;
+}
+
+.path-container {
+    background: $panel;
+    width: 40;
+    height: auto;
+    padding: 1;
+}
+
+.label {
+    width: 100%;
+    text-align: left;
+}
+
+.input {
+    align: center middle;
+    border: none;
+    padding: 1;
+    width: 100%;
+}
+
+.hint {
+    width: 100%;
+}
+
+HeaderIcon {
+    display: none;
+}

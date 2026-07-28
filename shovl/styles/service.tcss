@@ -1,0 +1,12 @@
+ServiceScreen {
+    layout: vertical;
+}
+
+.table {
+    height: 100%;
+    width: 100%;
+}
+
+HeaderIcon {
+    display: none;
+}

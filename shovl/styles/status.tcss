@@ -1,0 +1,29 @@
+StatusScreen {
+    align: center middle;
+}
+
+.status-container {
+    background: $panel;
+    width: 40;
+    height: 7;
+    padding: 1;
+}
+
+.label {
+    width: 100%;
+    text-align: center;
+}
+
+.indicator {
+    align: center middle;
+}
+
+.abort {
+    text-style: bold;
+    width: 100%;
+    text-align: left;
+}
+
+HeaderIcon {
+    display: none;
+}

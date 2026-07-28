@@ -1,0 +1,17 @@
+SqlScreen {
+    layout: vertical;
+}
+
+.text-area-container {
+    height: 1fr;
+}
+
+.text-area {
+    height: 100%;
+    width: 100%;
+    border: none;
+}
+
+HeaderIcon {
+    display: none;
+}

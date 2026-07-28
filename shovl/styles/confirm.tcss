@@ -1,0 +1,25 @@
+ConfirmScreen {
+    align: center middle;
+}
+
+.confirm-container {
+    background: $panel;
+    width: 40;
+    height: auto;
+    padding: 1;
+}
+
+.prompt {
+    width: 100%;
+    text-align: left;
+}
+
+.confirm {
+    text-style: bold;
+    width: 100%;
+    text-align: left;
+}
+
+HeaderIcon {
+    display: none;
+}

@@ -1,0 +1,15 @@
+FilterScreen {
+    align: center middle;
+}
+
+FilterScreen > .input {
+    width: 50;
+    height: auto;
+    padding: 1;
+    margin: 0;
+    border: none;
+}
+
+HeaderIcon {
+    display: none;
+}

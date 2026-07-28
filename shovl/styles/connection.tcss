@@ -1,0 +1,24 @@
+ConnectionScreen {
+    layout: vertical;
+}
+
+.connection-list {
+    height: 100%;
+    width: 100%;
+}
+
+.connection-item {
+    padding: 1;
+}
+
+.connection-name {
+    text-style: bold;
+}
+
+.connection-description {
+    color: $text-muted;
+}
+
+HeaderIcon {
+    display: none;
+}

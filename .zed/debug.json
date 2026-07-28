@@ -1,0 +1,16 @@
+[
+  {
+    "label": "Debug Backend (Uvicorn)",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "python": ".venv/bin/python",
+    "module": "shovl",
+  },
+  {
+    "label": "Debug Backend Unittests",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "python": ".venv/bin/python",
+    "module": "unittest",
+  },
+]
