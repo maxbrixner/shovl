@@ -4,7 +4,7 @@ A lightweight terminal-based database and S3 client built with Textual.
 
 ## Installation
 
-Install Shovle using pip:
+Install Shovl using pip:
 
 ```bash
 pip install shovl
