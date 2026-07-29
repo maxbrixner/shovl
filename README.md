@@ -316,8 +316,8 @@ This project is distributed under the terms specified in the LICENSE.md file.
 
 ## Contributing
 
-Shovl is an open-source project. For bug reports, feature requests, or contributions, please visit the [project repository](https://codeberg.org/maxbrixner/shovl).
+Shovl is an open-source project. For bug reports, feature requests, or contributions, please visit the [project repository](https://github.com/maxbrixner/shovl).
 
 ## Support
 
-For issues and support requests, please use the [project's issue tracker](https://codeberg.org/maxbrixner/shovl/issues).
+For issues and support requests, please use the [project's issue tracker](https://github.com/maxbrixner/shovl/issues)
