@@ -265,7 +265,7 @@ Valid themes can be found in the [Textual documentation](https://textual.textual
 
 **Important**: It is good practice to not store credentials in plain text within configuration files. Shovl supports environment variable substitution using double curly bracket syntax: `{{VARIABLE_NAME}}`.
 
-To configure an env-file, you can either sse the `env_file` parameter in the configuration file:
+To configure an env-file, you can either use the `env_file` parameter in the configuration file:
 
 ```json
 {
