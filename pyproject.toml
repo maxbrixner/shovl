@@ -33,8 +33,8 @@ dependencies = [
 ]
 
 [project.urls]
-Source = "https://codeberg.org/maxbrixner/shovl"
-Issues = "https://codeberg.org/maxbrixner/shovl/issues"
+Source = "https://github.com/maxbrixner/shovl"
+Issues = "https://github.com/maxbrixner/shovl/issues"
 
 [project.optional-dependencies]
 dev = [
