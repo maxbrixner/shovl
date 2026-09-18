@@ -1,13 +1,23 @@
-.venv
-.env
+# Python-generated files
 __pycache__/
-.ruff_cache/
+*.py[oc]
 build/
-*.egg-info/
 dist/
-*.log
+wheels/
+*.egg-info
+.ruff_cache/
+
+# Virtual environments
+.venv
+
+# Secrets
+.env
+
+# DB files
 *.db
-.shovl
-.shovl.log
-.shovl.env
 *.sql
+
+# Shovl files
+.shovl.log
+.shovl
+.shovl.env

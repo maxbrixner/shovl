@@ -4,6 +4,20 @@
 // see the documentation: https://zed.dev/docs/configuring-zed#settings-files
 {
   "lsp": {
+    "basedpyright": {
+      "settings": {
+        "basedpyright.analysis": {
+          "autoSearchPaths": true,
+          "useLibraryCodeForTypes": true,
+          "typeCheckingMode": "strict",
+          "extraPaths": ["./src"],
+        },
+        "python": {
+                  "venvPath": ".",
+                  "pythonPath": ".venv/bin/python"
+                }
+      },
+    },
     "ruff": {
       "initialization_options": {
         "settings": {

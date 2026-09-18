@@ -15,7 +15,6 @@ pip install shovl
 Shovl requires additional drivers depending on your target database systems. Install the appropriate extras for your use case:
 
 ```bash
-# Individual database support
 pip install shovl[sqlite]        # SQLite support
 pip install shovl[postgresql]    # PostgreSQL support
 pip install shovl[mysql]         # MySQL support
@@ -24,15 +23,6 @@ pip install shovl[oracle]        # Oracle Database support
 pip install shovl[snowflake]     # Snowflake support
 pip install shovl[duckdb]        # DuckDB support
 pip install shovl[ibmdb]         # IBM DB2 support
-
-# General database support (SQLAlchemy only)
-pip install shovl[database]
-
-# S3 and cloud storage support
-pip install shovl[bucket]
-
-# Complete installation with all features
-pip install shovl[all]
 ```
 
 **Note**: Shovl leverages SQLAlchemy's extensive database support. You may install additional SQLAlchemy-compatible drivers as needed for other database systems.

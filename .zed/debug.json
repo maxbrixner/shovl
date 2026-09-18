@@ -1,16 +1,16 @@
 [
   {
-    "label": "Debug Backend (Uvicorn)",
+    "label": "Debug Active File",
     "adapter": "Debugpy",
     "request": "launch",
     "python": ".venv/bin/python",
-    "module": "shovl",
+    "program": "${file}"
   },
   {
-    "label": "Debug Backend Unittests",
+    "label": "Debug Module",
     "adapter": "Debugpy",
     "request": "launch",
     "python": ".venv/bin/python",
-    "module": "unittest",
-  },
+    "module": "shovl"
+  }
 ]
