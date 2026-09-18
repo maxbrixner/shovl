@@ -2,8 +2,8 @@ import logging
 import pathlib
 from collections.abc import Callable, Sequence
 
-import boto3
-import botocore.client
+import boto3  # type: ignore[import-untyped]
+import botocore.client  # type: ignore[import-untyped]
 
 from shovl import schemas, services
 
@@ -61,7 +61,7 @@ class BucketProvider(ServiceProvider):
         # bucket. This can be skipped, e.g. when the user does not have
         # permission to call head_bucket operation.
         if self.config.test_connection:
-            self.client.head_bucket(
+            self.client.head_bucket(  # type: ignore[reportUnknownMemberType]
                 Bucket=services.resolve_credentials(self.config.bucket_name)
             )
 
@@ -96,12 +96,12 @@ class BucketProvider(ServiceProvider):
         )
 
         if not self.connected:
-            raise Exception("Not connected to a bucket.")
+            raise RuntimeError("Not connected to a bucket.")
 
         assert self.client is not None
 
         if prefix and not prefix.endswith("/"):
-            raise Exception("Prefix must end with a '/' character.")
+            raise RuntimeError("Prefix must end with a '/' character.")
 
         assert isinstance(self.config, schemas.BucketConfig)
 
@@ -112,42 +112,44 @@ class BucketProvider(ServiceProvider):
         if self.config.head_prefix and (not prefix or len(prefix) == 0):
             prefix = f"{self.config.head_prefix.rstrip('/')}/"
 
-        paginator = self.client.get_paginator("list_objects_v2")
+        paginator = self.client.get_paginator(  # type: ignore[reportUnknownMemberType]
+            "list_objects_v2"
+        )
 
         if prefix:
-            page_iterator = paginator.paginate(
+            page_iterator = paginator.paginate(  # type: ignore[reportUnknownMemberType]
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Prefix=prefix,
                 Delimiter="/",
             )
         else:
-            page_iterator = paginator.paginate(
+            page_iterator = paginator.paginate(  # type: ignore[reportUnknownMemberType]
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Delimiter="/",
             )
 
-        entities = []
-        for page in page_iterator:
+        entities: list[schemas.BucketEntity] = []
+        for page in page_iterator:  # type: ignore[reportUnknownVariableType]
             # "Folders" are found in CommonPrefixes
             if "CommonPrefixes" in page:
-                for obj in page["CommonPrefixes"]:
+                for obj in page["CommonPrefixes"]:  # type: ignore[reportUnknownVariableType]
                     entities.append(
                         schemas.BucketEntity(
-                            name=obj["Prefix"],
+                            name=obj["Prefix"],  # type: ignore[reportUnknownArgumentType]
                             type=schemas.BucketEntityType.folder,
                         )
                     )
 
             # Top-level files (if any) are found in 'Contents'
             if "Contents" in page:
-                for obj in page["Contents"]:
-                    if obj["Key"].endswith("/"):
+                for obj in page["Contents"]:  # type: ignore[reportUnknownVariableType]
+                    if obj["Key"].endswith("/"):  # type: ignore[reportUnknownArgumentType]
                         continue
                     entities.append(
                         schemas.BucketEntity(
-                            name=obj["Key"],
-                            size=obj["Size"],
-                            last_modified=obj["LastModified"],
+                            name=obj["Key"],  # type: ignore[reportUnknownArgumentType]
+                            size=obj["Size"],  # type: ignore[reportUnknownArgumentType]
+                            last_modified=obj["LastModified"],  # type: ignore[reportUnknownArgumentType]
                             type=schemas.BucketEntityType.file,
                         )
                     )
@@ -185,19 +187,19 @@ class BucketProvider(ServiceProvider):
         self.abort_event.clear()
 
         if not self.connected:
-            raise Exception("Not connected to a bucket.")
+            raise RuntimeError("Not connected to a bucket.")
 
         assert self.client is not None
         assert isinstance(self.config, schemas.BucketConfig)
 
         # List bucket entites
         if recursive:
-            entities = self.client.list_objects_v2(
+            entities = self.client.list_objects_v2(  # type: ignore[reportUnknownArgumentType]
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Prefix=key,
             )
         else:
-            entities = self.client.list_objects_v2(
+            entities = self.client.list_objects_v2(  # type: ignore[reportUnknownArgumentType]
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Prefix=key,
                 Delimiter="/",
@@ -206,14 +208,14 @@ class BucketProvider(ServiceProvider):
         if "Contents" not in entities:
             return
 
-        entities = entities["Contents"]
+        entities = entities["Contents"]  # type: ignore[reportUnknownArgumentType]
 
         # Filter out "folders" (keys that end with "/") and get the list of
         # files to download
-        files = [
+        files: list[str] = [
             entity["Key"]
-            for entity in entities
-            if "Key" in entity and not entity["Key"].endswith("/")
+            for entity in entities  # type: ignore[reportUnknownVariableType]
+            if "Key" in entity and not entity["Key"].endswith("/")  # type: ignore[reportUnknownArgumentType]
         ]
 
         # Get the parent directory of the S3 key. We want to remove the path
@@ -244,7 +246,7 @@ class BucketProvider(ServiceProvider):
             if not local_filename.parent.exists():
                 local_filename.parent.mkdir(parents=True, exist_ok=True)
 
-            self.client.download_file(
+            self.client.download_file(  # type: ignore[reportUnknownArgumentType]
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Key=file,
                 Filename=str(local_filename),
@@ -273,10 +275,10 @@ class BucketProvider(ServiceProvider):
         self.abort_event.clear()
 
         if not self.connected:
-            raise Exception("Not connected to a bucket.")
+            raise RuntimeError("Not connected to a bucket.")
 
         if not source.exists():
-            raise Exception(f"Source path '{source}' does not exist.")
+            raise FileNotFoundError(f"Source path '{source}' does not exist.")
 
         assert self.client is not None
         assert isinstance(self.config, schemas.BucketConfig)
@@ -307,7 +309,7 @@ class BucketProvider(ServiceProvider):
             else:
                 s3_key = relative_path.as_posix()
 
-            self.client.upload_file(
+            self.client.upload_file(  # type: ignore[reportUnknownArgumentType]
                 Filename=str(entity),
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Key=s3_key,
@@ -332,18 +334,18 @@ class BucketProvider(ServiceProvider):
         self.abort_event.clear()
 
         if not self.connected:
-            raise Exception("Not connected to a bucket.")
+            raise RuntimeError("Not connected to a bucket.")
 
         assert self.client is not None
         assert isinstance(self.config, schemas.BucketConfig)
 
         if recursive:
-            entities = self.client.list_objects_v2(
+            entities = self.client.list_objects_v2(  # type: ignore[reportUnknownArgumentType]
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Prefix=key,
             )
         else:
-            entities = self.client.list_objects_v2(
+            entities = self.client.list_objects_v2(  # type: ignore[reportUnknownArgumentType]
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Prefix=key,
                 Delimiter="/",
@@ -352,12 +354,12 @@ class BucketProvider(ServiceProvider):
         if "Contents" not in entities:
             return
 
-        entities = entities["Contents"]
+        entities = entities["Contents"]  # type: ignore[reportUnknownArgumentType]
 
-        files = [
+        files: list[str] = [
             entity["Key"]
-            for entity in entities
-            if "Key" in entity and not entity["Key"].endswith("/")
+            for entity in entities  # type: ignore[reportUnknownArgumentType]
+            if "Key" in entity and not entity["Key"].endswith("/")  # type: ignore[reportUnknownArgumentType]
         ]
 
         for index, file in enumerate(files):
@@ -369,7 +371,7 @@ class BucketProvider(ServiceProvider):
 
             progress_callback(index + 1, len(files))
 
-            self.client.delete_object(
+            self.client.delete_object(  # type: ignore[reportUnknownArgumentType]
                 Bucket=services.resolve_credentials(self.config.bucket_name),
                 Key=file,
             )
@@ -420,17 +422,17 @@ class BucketProvider(ServiceProvider):
         logger.info("Creating S3 client...")
 
         if not self.session:
-            raise Exception("AWS session not created.")
+            raise RuntimeError("AWS session not created.")
 
         assert isinstance(self.config, schemas.BucketConfig)
 
         if not self.config.use_sts:
-            self.client = self.session.client("s3")
+            self.client = self.session.client("s3")  # type: ignore[reportUnknownArgumentType]
         else:
             if not self.temp_credentials:
-                raise Exception("Temporary credentials not obtained.")
+                raise RuntimeError("Temporary credentials not obtained.")
 
-            self.client = boto3.client(
+            self.client = boto3.client(  # type: ignore[reportUnknownArgumentType]
                 "s3",
                 aws_access_key_id=self.temp_credentials.access_key_id,
                 aws_secret_access_key=self.temp_credentials.secret_access_key,
@@ -459,7 +461,7 @@ class BucketProvider(ServiceProvider):
         logger.debug("Fetching temporary credentials using AWS STS...")
 
         if not self.session:
-            raise Exception("AWS session not created.")
+            raise RuntimeError("AWS session not created.")
 
         assert isinstance(self.config, schemas.BucketConfig)
 
@@ -475,7 +477,7 @@ class BucketProvider(ServiceProvider):
             else None
         )
 
-        sts = self.session.client(
+        sts = self.session.client(  # type: ignore[reportUnknownArgumentType]
             "sts",
             region_name=services.resolve_credentials(self.config.region_name)
             if self.config.region_name
@@ -488,18 +490,18 @@ class BucketProvider(ServiceProvider):
             else None,
         )
 
-        response = sts.assume_role(
+        response = sts.assume_role(  # type: ignore[reportUnknownArgumentType]
             RoleArn=f"arn:aws:iam::{account_id}:role/{role_name}",
             RoleSessionName="ShovlBucketProviderSession",
         )
 
         if "Credentials" not in response:
-            raise Exception(
+            raise RuntimeError(
                 "Failed to assume AWS role for temporary credentials."
             )
 
         self.temp_credentials = schemas.TemporaryCredentials(
-            **response["Credentials"]
+            **response["Credentials"]  # type: ignore[reportUnknownArgumentType]
         )
 
         logger.debug("Temporary credentials obtained successfully.")
