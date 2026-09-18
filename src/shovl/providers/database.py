@@ -86,7 +86,7 @@ class DatabaseProvider(ServiceProvider):
         logger.debug(f"Inspecting schemas in database: {self.config.name}")
 
         if not self.connected:
-            raise Exception("Not connected to a database.")
+            raise RuntimeError("Not connected to a database.")
 
         assert self.inspector is not None
 
@@ -115,7 +115,7 @@ class DatabaseProvider(ServiceProvider):
         logger.debug(f"Inspecting tables in schema '{schema}'.")
 
         if not self.connected:
-            raise Exception("Not connected to a database.")
+            raise RuntimeError("Not connected to a database.")
 
         assert self.inspector is not None
 
@@ -143,7 +143,7 @@ class DatabaseProvider(ServiceProvider):
         logger.debug(f"Inspecting views in schema '{schema}'.")
 
         if not self.connected:
-            raise Exception("Not connected to a database.")
+            raise RuntimeError("Not connected to a database.")
 
         assert self.inspector is not None
 
@@ -173,7 +173,7 @@ class DatabaseProvider(ServiceProvider):
         logger.debug(f"Inspecting table '{table_name}' in schema '{schema}'.")
 
         if not self.connected:
-            raise Exception("Not connected to a database.")
+            raise RuntimeError("Not connected to a database.")
 
         assert self.inspector is not None
 
@@ -181,7 +181,7 @@ class DatabaseProvider(ServiceProvider):
             table_name=table_name, schema=schema
         )
 
-        result = []
+        result: list[schemas.DatabaseEntity] = []
         for column in columns:
             result.append(
                 schemas.DatabaseEntity(
@@ -210,7 +210,7 @@ class DatabaseProvider(ServiceProvider):
         logger.debug(f"Inspecting view '{view_name}' in schema '{schema}'.")
 
         if not self.connected:
-            raise Exception("Not connected to a database.")
+            raise RuntimeError("Not connected to a database.")
 
         assert self.inspector is not None
 
@@ -218,7 +218,7 @@ class DatabaseProvider(ServiceProvider):
             table_name=view_name, schema=schema
         )
 
-        result = []
+        result: list[schemas.DatabaseEntity] = []
         for column in columns:
             result.append(
                 schemas.DatabaseEntity(
@@ -247,7 +247,7 @@ class DatabaseProvider(ServiceProvider):
         logger.debug(f"Fetching preview of '{name}' in schema '{schema}'.")
 
         if not self.connected:
-            raise Exception("Not connected to a database.")
+            raise RuntimeError("Not connected to a database.")
 
         assert self.connection is not None
         assert isinstance(self.config, schemas.DatabaseConfig)
@@ -302,7 +302,7 @@ class DatabaseProvider(ServiceProvider):
         )
 
         if not self.connected:
-            raise Exception("Not connected to a database.")
+            raise RuntimeError("Not connected to a database.")
 
         assert self.connection is not None
 

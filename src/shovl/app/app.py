@@ -7,7 +7,7 @@ from shovl import schemas, screens
 logger = logging.getLogger(__name__)
 
 
-class ShovlApp(App[int]):
+class ShovlApp(App[None]):
     """
     The main application class for Shovl.
     """

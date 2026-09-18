@@ -1,5 +1,3 @@
-from typing import Union
-
 import pydantic
 
 
@@ -42,11 +40,13 @@ class ProviderConfig(pydantic.BaseModel):
 
 
 class DatabaseConfig(ProviderConfig):
-    engine_parameters: dict | None = pydantic.Field(
-        default=None,
-        description="Additional parameters to pass to the SQLAlchemy engine. "
-        "For example, {'isolation_level': 'REPEATABLE READ', 'connect_args': "
-        "{'sslmode': 'require'}}",
+    engine_parameters: dict[str, str | int | float | bool] | None = (
+        pydantic.Field(
+            default=None,
+            description="Additional parameters to pass to the SQLAlchemy engine. "
+            "For example, {'isolation_level': 'REPEATABLE READ', 'connect_args': "
+            "{'sslmode': 'require'}}",
+        )
     )
     fetch_limit: int = pydantic.Field(
         default=1000,
@@ -85,7 +85,7 @@ class BucketConfig(ProviderConfig):
     role_name: str | None = pydantic.Field(
         default=None, description="AWS role name for STS access."
     )
-    client_config: dict | None = pydantic.Field(
+    client_config: dict[str, str | int | float | bool] | None = pydantic.Field(
         default=None,
         description="Additional parameters to pass to the boto3 session, see "
         "https://docs.aws.amazon.com/botocore/latest/reference/config.html",
@@ -102,7 +102,7 @@ class BucketConfig(ProviderConfig):
     )
 
 
-ServiceConfig = Union[DatabaseConfig, BucketConfig]
+ServiceConfig = DatabaseConfig | BucketConfig
 
 
 class ConfigSchema(pydantic.BaseModel):
