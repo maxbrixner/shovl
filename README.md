@@ -12,13 +12,11 @@ pip install shovl
 
 ### Database-Specific Dependencies
 
-Shovl requires additional drivers depending on your target database systems. Install the appropriate extras for your use case:
+Shovl requires additional drivers depending on your target database systems. Install the appropriate extras for your use case (Sqlite is supported by default):
 
 ```bash
-pip install shovl[sqlite]        # SQLite support
 pip install shovl[postgresql]    # PostgreSQL support
 pip install shovl[mysql]         # MySQL support
-pip install shovl[mariadb]       # MariaDB support
 pip install shovl[oracle]        # Oracle Database support
 pip install shovl[snowflake]     # Snowflake support
 pip install shovl[duckdb]        # DuckDB support
