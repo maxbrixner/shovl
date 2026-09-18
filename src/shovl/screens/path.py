@@ -40,7 +40,7 @@ class PathScreen(ModalScreen[pathlib.Path | None]):
         self,
         label: str | None = None,
         path: pathlib.Path | None = None,
-        restrictions: list[schemas.PathRestriction] = [],
+        restrictions: list[schemas.PathRestriction] | None = None,
     ) -> None:
         """
         Initialize the path screen.
@@ -54,7 +54,7 @@ class PathScreen(ModalScreen[pathlib.Path | None]):
         self.path_changed_event = threading.Event()
 
         self.current_path = str(path) if path else ""
-        self.restrictions = restrictions
+        self.restrictions = restrictions if restrictions is not None else []
 
     def compose(self) -> ComposeResult:
         """
@@ -81,7 +81,7 @@ class PathScreen(ModalScreen[pathlib.Path | None]):
         Start the path check worker when the screen is mounted.
         """
         self.run_in_thread(
-            self.path_check_worker,
+            target=self.path_check_worker,
             name="PathCheckWorker",
             callback=self.path_checked_callback,
         )
@@ -124,7 +124,7 @@ class PathScreen(ModalScreen[pathlib.Path | None]):
 
     def run_in_thread(
         self,
-        target: Callable,
+        target: Callable[..., Any],
         name: str,
         *args: Any,
         **kwargs: Any,
@@ -134,7 +134,7 @@ class PathScreen(ModalScreen[pathlib.Path | None]):
         screen while the thread is running.
         """
         if self.worker and self.worker.is_alive():
-            raise Exception("Worker is already running")
+            raise RuntimeError("Worker is already running")
 
         self.worker = threading.Thread(
             target=target, daemon=True, name=name, args=args, kwargs=kwargs
@@ -160,13 +160,10 @@ class PathScreen(ModalScreen[pathlib.Path | None]):
         ):
             return False
 
-        if (
+        return not (
             schemas.PathRestriction.must_be_file in self.restrictions
             and not path.is_file()
-        ):
-            return False
-
-        return True
+        )
 
     ### Worker methods ###
 
@@ -180,7 +177,7 @@ class PathScreen(ModalScreen[pathlib.Path | None]):
         while True:
             self.path_changed_event.wait()
 
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 callback, self.check_path(path=self.current_path)
             )
 

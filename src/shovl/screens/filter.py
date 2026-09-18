@@ -1,4 +1,5 @@
 import logging
+import typing
 from collections.abc import Callable
 
 from textual.app import ComposeResult
@@ -9,12 +10,14 @@ from textual.widgets import Input
 logger = logging.getLogger("shovl.screens.filter")
 
 
-class FilterScreen(ModalScreen):
+class FilterScreen(ModalScreen[None]):
     """
     Screen to filter a list of items.
     """
 
-    BINDINGS = [("escape", "cancel", "cancel")]
+    BINDINGS: typing.ClassVar[list[tuple[str, str, str]]] = [
+        ("escape", "cancel", "cancel")
+    ]
 
     CSS_PATH = "../styles/filter.tcss"
 

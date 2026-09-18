@@ -1,4 +1,5 @@
 import enum
+from typing import Any
 
 import pydantic
 
@@ -25,7 +26,7 @@ class DatabaseEntity(ServiceEntity):
     Represents an entity in a database.
     """
 
-    data: dict | None = pydantic.Field(
+    data: dict[str, Any] | None = pydantic.Field(
         default=None, description="Data of the row (only for rows)."
     )
     datatype: str | None = pydantic.Field(

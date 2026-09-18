@@ -1,6 +1,7 @@
 import copy
 import logging
 import pathlib
+import typing
 
 from rich.text import Text
 from textual.widgets import DataTable
@@ -19,7 +20,7 @@ class DatabaseScreen(ServiceScreen):
     Screen to browse the contents of a database.
     """
 
-    BINDINGS = [
+    BINDINGS: typing.ClassVar[list[tuple[str, str, str]]] = [
         ("backspace", "back", "back"),
         ("f", "filter", "filter"),
         ("p", "preview", "preview"),
@@ -82,7 +83,7 @@ class DatabaseScreen(ServiceScreen):
                     filepath=path,
                 )
 
-        self.app.push_screen(
+        self.app.push_screen(  # type: ignore[reportUnknownMemberType]
             PathScreen(
                 label="Enter the path to an SQL file:",
                 path=self.last_query_file,
@@ -177,10 +178,10 @@ class DatabaseScreen(ServiceScreen):
                     view_name=entity.name, schema=entity.dbschema
                 )
             case _:
-                raise Exception(f"Unsupported entity type: {entity.type}")
+                raise TypeError(f"Unsupported entity type: {entity.type}")
 
         self.all_entities = entities
-        self.filtered_entities = copy.copy(self.all_entities)
+        self.filtered_entities = copy.copy(list(self.all_entities))
 
         if self.current_entity and add_current_to_history:
             self.add_to_history()
@@ -201,7 +202,7 @@ class DatabaseScreen(ServiceScreen):
             schema=entity.dbschema,
             name=entity.name,
         )
-        self.filtered_entities = copy.copy(self.all_entities)
+        self.filtered_entities = copy.copy(list(self.all_entities))
 
         if self.current_entity:
             self.add_to_history()
@@ -218,7 +219,7 @@ class DatabaseScreen(ServiceScreen):
         assert isinstance(self.provider, DatabaseProvider)
 
         if not filepath.exists() or not filepath.is_file():
-            raise Exception(f"File not found: {filepath}")
+            raise FileNotFoundError(f"File not found: {filepath}")
 
         with filepath.open("r") as file:
             query = file.read()
@@ -226,10 +227,8 @@ class DatabaseScreen(ServiceScreen):
         entities, affected_rows = self.provider.execute_query(query=query)
 
         if entities:  # i.e. a select statement
-            (self.all_entities, rowcount) = self.provider.execute_query(
-                query=query
-            )
-            self.filtered_entities = copy.copy(self.all_entities)
+            self.all_entities, _ = self.provider.execute_query(query=query)
+            self.filtered_entities = copy.copy(list(self.all_entities))
 
             if self.current_entity:
                 self.add_to_history()
@@ -250,9 +249,9 @@ class DatabaseScreen(ServiceScreen):
         query = self.current_filter.lower().strip()
 
         if not query:
-            self.filtered_entities = copy.copy(self.all_entities)
+            self.filtered_entities = copy.copy(list(self.all_entities))
         else:
-            self.filtered_entities = []
+            self.filtered_entities: typing.Sequence[schemas.ServiceEntity] = []
             for entity in self.all_entities:
                 assert isinstance(entity, schemas.DatabaseEntity)
                 if not entity.data and query in entity.name.lower():
@@ -281,12 +280,12 @@ class DatabaseScreen(ServiceScreen):
                 | schemas.DatabaseEntityType.table
                 | schemas.DatabaseEntityType.view
             ):
-                self.table.add_columns("Name", "Type")
+                self.table.add_columns("Name", "Type")  # type: ignore[reportUnknownMemberType]
             case schemas.DatabaseEntityType.column:
-                self.table.add_columns("Name", "Data Type", "Nullable", "Type")
+                self.table.add_columns("Name", "Data Type", "Nullable", "Type")  # type: ignore[reportUnknownMemberType]
             case schemas.DatabaseEntityType.row:
                 assert entity.data is not None
-                self.table.add_columns(*entity.data.keys())
+                self.table.add_columns(*entity.data.keys())  # type: ignore[reportUnknownMemberType]
 
     def add_row(self, entity: schemas.ServiceEntity) -> None:
         """
@@ -296,7 +295,7 @@ class DatabaseScreen(ServiceScreen):
 
         name = self.get_entity_display_name(entity=entity)
 
-        primary_color = self.app.theme_variables.get("primary")
+        primary_color = self.app.theme_variables.get("primary")  # type: ignore[reportUnknownMemberType]
 
         if entity.type in (
             schemas.DatabaseEntityType.schemas,
@@ -306,11 +305,11 @@ class DatabaseScreen(ServiceScreen):
             schemas.DatabaseEntityType.table,
             schemas.DatabaseEntityType.view,
         ):
-            self.table.add_row(
+            self.table.add_row(  # type: ignore[reportUnknownMemberType]
                 Text(name, style=f"bold {primary_color}"), entity.type.value
             )
         elif entity.type == schemas.DatabaseEntityType.column:
-            self.table.add_row(
+            self.table.add_row(  # type: ignore[reportUnknownMemberType]
                 name,
                 entity.datatype or "",
                 "True" if entity.nullable else "False",
@@ -318,7 +317,7 @@ class DatabaseScreen(ServiceScreen):
             )
         elif entity.type == schemas.DatabaseEntityType.row:
             assert entity.data is not None
-            self.table.add_row(*[str(value) for value in entity.data.values()])
+            self.table.add_row(*[str(value) for value in entity.data.values()])  # type: ignore[reportUnknownMemberType]
 
     def get_entity_display_name(self, entity: schemas.DatabaseEntity) -> str:
         """
@@ -336,23 +335,23 @@ class DatabaseScreen(ServiceScreen):
         Preview a database table.
         """
         try:
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.push_status_screen, label="Fetching preview..."
             )
 
             self.fetch_preview(entity=entity)
 
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.refresh_view, show_truncated_hint=True
             )
 
-            self.app.call_from_thread(self.dismiss_status_screen)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
         except Exception as exception:
-            logger.exception(f"Preview failed: {exception}")
-            self.app.call_from_thread(self.dismiss_status_screen)
-            self.app.call_from_thread(self.focus_view)
+            logger.exception("Preview failed.", exc_info=exception)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
+            self.app.call_from_thread(self.focus_view)  # type: ignore[reportUnknownMemberType]
             message = str(exception)
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_error(f"Preview failed: {message}")
             )
 
@@ -364,21 +363,21 @@ class DatabaseScreen(ServiceScreen):
         Execute a database query.
         """
         try:
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.push_status_screen, label="Executing query..."
             )
 
             affected_rows = self.execute_query(filepath=filepath)
 
             if affected_rows >= 0:
-                self.app.call_from_thread(
+                self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                     lambda: self.notify_info(
                         f"Query executed successfully. Affected rows: "
                         f"{affected_rows}"
                     )
                 )
             else:
-                self.app.call_from_thread(
+                self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                     lambda: self.notify_info(
                         "Query executed successfully. No affected rows."
                     )
@@ -386,16 +385,16 @@ class DatabaseScreen(ServiceScreen):
 
             # todo: refresh?
 
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.refresh_view, show_truncated_hint=True
             )
 
-            self.app.call_from_thread(self.dismiss_status_screen)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
         except Exception as exception:
-            logger.exception(f"Query failed: {exception}")
-            self.app.call_from_thread(self.dismiss_status_screen)
-            self.app.call_from_thread(self.focus_view)
+            logger.exception("Query failed.", exc_info=exception)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
+            self.app.call_from_thread(self.focus_view)  # type: ignore[reportUnknownMemberType]
             message = str(exception)
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_error(f"Query failed: {message}")
             )

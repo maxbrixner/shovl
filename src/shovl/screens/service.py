@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Sequence
+from typing import Any
 
 from textual.app import ComposeResult
 from textual.widgets import DataTable, Footer, Header
@@ -20,14 +21,14 @@ class ServiceScreen(BaseScreen):
 
     CSS_PATH = "../styles/service.tcss"
 
-    table: DataTable
+    table: DataTable[Any]
 
     connection: schemas.ServiceConfig
     provider: providers.ServiceProvider
 
     history: list[schemas.HistoryItem]
     all_entities: Sequence[schemas.ServiceEntity]
-    filtered_entites: Sequence[schemas.ServiceEntity]
+    filtered_entities: Sequence[schemas.ServiceEntity]
 
     current_entity: schemas.ServiceEntity | None
 
@@ -85,7 +86,7 @@ class ServiceScreen(BaseScreen):
             )
         else:
             self.provider.disconnect()
-            self.app.pop_screen()
+            self.app.pop_screen()  # type: ignore[reportUnknownMemberType]
 
     ### Class methods ###
 
@@ -113,7 +114,7 @@ class ServiceScreen(BaseScreen):
         """
         Add rows to the table based on a list of entities.
         """
-        with self.app.batch_update():
+        with self.app.batch_update():  # type: ignore[reportUnknownMemberType]
             self.table.clear(columns=True)
 
             if not self.filtered_entities:
@@ -143,7 +144,7 @@ class ServiceScreen(BaseScreen):
         Get the data of the currently selected row in the table and return it
         as a BucketEntity object.
         """
-        if self.table.cursor_row is None:
+        if self.table.cursor_row < 0:
             return None
 
         if self.table.cursor_row >= len(self.filtered_entities):
@@ -207,7 +208,7 @@ class ServiceScreen(BaseScreen):
         Inspect a service entity.
         """
         try:
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.push_status_screen, label="Inspecting..."
             )
 
@@ -219,24 +220,24 @@ class ServiceScreen(BaseScreen):
                 self.current_filter = apply_filter
                 self.filter_view()
 
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.refresh_view, show_truncated_hint=True
             )
 
             if select_row and select_row < len(self.filtered_entities):
-                self.app.call_from_thread(
+                self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                     lambda: self.table.move_cursor(
                         row=select_row, column=0, animate=False
                     )
                 )
 
-            self.app.call_from_thread(self.dismiss_status_screen)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
         except Exception as exception:
-            logger.exception(f"Inspection failed: {exception}")
-            self.app.call_from_thread(self.dismiss_status_screen)
-            self.app.call_from_thread(self.focus_view)
+            logger.exception("Inspection failed.", exc_info=exception)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
+            self.app.call_from_thread(self.focus_view)  # type: ignore[reportUnknownMemberType]
             message = str(exception)
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_error(
                     f"Unable to inspect entity: {message}"
                 )

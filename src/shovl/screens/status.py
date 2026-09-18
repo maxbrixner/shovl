@@ -10,7 +10,7 @@ from textual.widgets import Label, LoadingIndicator
 logger = logging.getLogger("shovl.screens.status")
 
 
-class StatusScreen(ModalScreen):
+class StatusScreen(ModalScreen[None]):
     """
     Screen to display a status.
     """
@@ -21,14 +21,14 @@ class StatusScreen(ModalScreen):
 
     initial_label: str | None
 
-    abort_callback: Callable | None
+    abort_callback: Callable[[], None] | None
 
     ### Lifecycle methods ###
 
     def __init__(
         self,
         label: str | None = None,
-        abort_callback: Callable | None = None,
+        abort_callback: Callable[[], None] | None = None,
     ) -> None:
         """
         Initialize the status screen.
@@ -61,9 +61,8 @@ class StatusScreen(ModalScreen):
         Handle key presses within the input field. Closes the screen if the
         user hits the escape key.
         """
-        if event.key == "a":
-            if self.abort_callback:
-                self.abort_callback()
+        if event.key == "a" and self.abort_callback is not None:
+            self.abort_callback()
 
     ### Class methods ###
 

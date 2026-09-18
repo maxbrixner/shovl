@@ -1,6 +1,7 @@
 import copy
 import logging
 import pathlib
+import typing
 
 from rich.text import Text
 from textual.widgets import DataTable
@@ -19,7 +20,7 @@ class BucketScreen(ServiceScreen):
     Screen to browse the contents of a S3 bucket.
     """
 
-    BINDINGS = [
+    BINDINGS: typing.ClassVar[list[tuple[str, str, str]]] = [
         ("backspace", "back", "back"),
         ("f", "filter", "filter"),
         ("d", "download", "download"),
@@ -51,7 +52,7 @@ class BucketScreen(ServiceScreen):
                         target_path=path,
                     )
 
-            self.app.push_screen(
+            self.app.push_screen(  # type: ignore[reportUnknownMemberType]
                 PathScreen(
                     label="Enter local target directory:",
                     restrictions=[schemas.PathRestriction.must_be_directory],
@@ -83,7 +84,7 @@ class BucketScreen(ServiceScreen):
                         source_path=path,
                     )
 
-            self.app.push_screen(
+            self.app.push_screen(  # type: ignore[reportUnknownMemberType]
                 PathScreen(
                     label="Enter local source file or directory:",
                     restrictions=[schemas.PathRestriction.must_exist],
@@ -105,7 +106,7 @@ class BucketScreen(ServiceScreen):
 
         short_path = pathlib.Path(entity.name).name
 
-        self.app.push_screen(
+        self.app.push_screen(  # type: ignore[reportUnknownMemberType]
             screens.ConfirmScreen(
                 label=f"Are you sure you want to delete '{short_path}'?",
             ),
@@ -165,7 +166,7 @@ class BucketScreen(ServiceScreen):
             case schemas.BucketEntityType.folder:
                 entities = self.provider.inspect(prefix=entity.name)
             case _:
-                raise Exception(f"Unsupported entity type: {entity.type}")
+                raise TypeError(f"Unsupported entity type: {entity.type}")
 
         self.all_entities = entities
         self.filtered_entities = copy.copy(self.all_entities)
@@ -190,7 +191,7 @@ class BucketScreen(ServiceScreen):
             schemas.BucketEntityType.file,
             schemas.BucketEntityType.folder,
         ):
-            raise Exception("Only files and folders can be downloaded.")
+            raise TypeError("Only files and folders can be downloaded.")
 
         self.provider.download(
             key=entity.name,
@@ -211,7 +212,7 @@ class BucketScreen(ServiceScreen):
             schemas.BucketEntityType.bucket,
             schemas.BucketEntityType.folder,
         ):
-            raise Exception("Only buckets and folders can be upload targets.")
+            raise TypeError("Only buckets and folders can be upload targets.")
 
         self.provider.upload(
             key=entity.name,
@@ -253,7 +254,7 @@ class BucketScreen(ServiceScreen):
             schemas.BucketEntityType.folder,
             schemas.BucketEntityType.file,
         ):
-            raise Exception("Only folders and files can be deleted.")
+            raise TypeError("Only folders and files can be deleted.")
 
         self.provider.delete(
             key=entity.name,
@@ -280,7 +281,7 @@ class BucketScreen(ServiceScreen):
         """
         Add columns to the table based on the type of entity.
         """
-        self.table.add_columns("Name", "Size", "Last Modified", "Type")
+        self.table.add_columns("Name", "Size", "Last Modified", "Type")  # type: ignore[reportUnknownMemberType]
 
     def add_row(self, entity: schemas.ServiceEntity) -> None:
         """
@@ -297,9 +298,9 @@ class BucketScreen(ServiceScreen):
             else ""
         )
 
-        primary_color = self.app.theme_variables.get("primary")
+        primary_color = self.app.theme_variables.get("primary")  # type: ignore[reportUnknownMemberType]
 
-        self.table.add_row(
+        self.table.add_row(  # type: ignore[reportUnknownMemberType]
             Text(
                 name,
                 style=f"bold {primary_color}"
@@ -327,7 +328,7 @@ class BucketScreen(ServiceScreen):
         """
         Callback function to update the status screen with download progress.
         """
-        self.app.call_from_thread(
+        self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
             lambda: (
                 self.status_screen.update_label(
                     f"Downloading file {current}/{total}..."
@@ -341,7 +342,7 @@ class BucketScreen(ServiceScreen):
         """
         Callback function to update the status screen with upload progress.
         """
-        self.app.call_from_thread(
+        self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
             lambda: (
                 self.status_screen.update_label(
                     f"Uploading file {current}/{total}..."
@@ -355,7 +356,7 @@ class BucketScreen(ServiceScreen):
         """
         Callback function to update the status screen with delete progress.
         """
-        self.app.call_from_thread(
+        self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
             lambda: (
                 self.status_screen.update_label(
                     f"Deleting file {current}/{total}..."
@@ -382,7 +383,7 @@ class BucketScreen(ServiceScreen):
         Download an entity.
         """
         try:
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.push_status_screen,
                 label="Preparing download...",
                 abort_callback=self.abort_callback,
@@ -390,19 +391,19 @@ class BucketScreen(ServiceScreen):
 
             self.download(entity=entity, target_path=target_path)
 
-            self.app.call_from_thread(self.dismiss_status_screen)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
 
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_info(
                     f"Download of '{entity.name}' completed."
                 )
             )
         except Exception as exception:
-            logger.exception(f"Download failed: {exception}")
-            self.app.call_from_thread(self.dismiss_status_screen)
-            self.app.call_from_thread(self.focus_view)
+            logger.exception("Download failed.", exc_info=exception)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
+            self.app.call_from_thread(self.focus_view)  # type: ignore[reportUnknownMemberType]
             message = str(exception)
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_error(f"Download failed: {message}")
             )
 
@@ -413,7 +414,7 @@ class BucketScreen(ServiceScreen):
         Upload a path.
         """
         try:
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.push_status_screen,
                 label="Preparing upload...",
                 abort_callback=self.abort_callback,
@@ -425,23 +426,23 @@ class BucketScreen(ServiceScreen):
                 self.inspect(
                     entity=self.current_entity, add_current_to_history=False
                 )
-                self.app.call_from_thread(
+                self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                     self.refresh_view, show_truncated_hint=False
                 )
 
-            self.app.call_from_thread(self.dismiss_status_screen)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
 
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_info(
                     f"Upload of '{source_path}' completed."
                 )
             )
         except Exception as exception:
-            logger.exception(f"Upload failed: {exception}")
-            self.app.call_from_thread(self.dismiss_status_screen)
-            self.app.call_from_thread(self.focus_view)
+            logger.exception("Upload failed.", exc_info=exception)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
+            self.app.call_from_thread(self.focus_view)  # type: ignore[reportUnknownMemberType]
             message = str(exception)
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_error(f"Upload failed: {message}")
             )
 
@@ -450,7 +451,7 @@ class BucketScreen(ServiceScreen):
         Delete a path.
         """
         try:
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.push_status_screen,
                 label="Preparing deletion...",
                 abort_callback=self.abort_callback,
@@ -462,22 +463,22 @@ class BucketScreen(ServiceScreen):
                 self.inspect(
                     entity=self.current_entity, add_current_to_history=False
                 )
-                self.app.call_from_thread(
+                self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                     self.refresh_view, show_truncated_hint=False
                 )
 
-            self.app.call_from_thread(self.dismiss_status_screen)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
 
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_info(
                     f"Deletion of '{entity.name}' completed."
                 )
             )
         except Exception as exception:
-            logger.exception(f"Deletion failed: {exception}")
-            self.app.call_from_thread(self.dismiss_status_screen)
-            self.app.call_from_thread(self.focus_view)
+            logger.exception("Deletion failed.", exc_info=exception)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
+            self.app.call_from_thread(self.focus_view)  # type: ignore[reportUnknownMemberType]
             message = str(exception)
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_error(f"Deletion failed: {message}")
             )

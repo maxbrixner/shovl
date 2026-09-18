@@ -1,4 +1,5 @@
 import logging
+import typing
 
 from textual.app import ComposeResult
 from textual.widgets import Footer, Header, Label, ListItem, ListView
@@ -17,7 +18,7 @@ class ConnectionScreen(BaseScreen):
 
     CSS_PATH = "../styles/connection.tcss"
 
-    BINDINGS = [
+    BINDINGS: typing.ClassVar[list[tuple[str, str, str]]] = [
         ("f", "filter", "filter"),
         ("q", "quit", "quit"),
     ]
@@ -61,7 +62,7 @@ class ConnectionScreen(BaseScreen):
         """
         Quit the app.
         """
-        self.app.exit()
+        self.app.exit()  # type: ignore[reportUnknownMemberType]
 
     ### Event handlers ###
 
@@ -171,7 +172,7 @@ class ConnectionScreen(BaseScreen):
         the UI.
         """
         if connection_config.url == "sqlite://":
-            raise Exception("SQLite in-memory connections are not supported.")
+            raise TypeError("SQLite in-memory connections are not supported.")
 
         self.test_database_provider()
 
@@ -191,8 +192,11 @@ class ConnectionScreen(BaseScreen):
             import sqlalchemy
 
             logger.info(f"SQLAlchemy version is {sqlalchemy.__version__}")
-        except Exception:
-            raise Exception(
+        except Exception as exception:
+            logger.exception(
+                "Failed to initialize database provider.", exc_info=exception
+            )
+            raise RuntimeError(
                 "Failed to initialize database provider. Try installing "
                 "SQLAlchemy."
             )
@@ -209,10 +213,10 @@ class ConnectionScreen(BaseScreen):
         from shovl.screens.database import DatabaseScreen
 
         if not isinstance(self.provider, DatabaseProvider):
-            raise Exception("Invalid provider type")
+            raise TypeError("Invalid provider type")
 
         self.dismiss_status_screen()
-        self.app.push_screen(
+        self.app.push_screen(  # type: ignore[reportUnknownMemberType]
             DatabaseScreen(
                 config=self.config,
                 connection=connection_config,
@@ -245,15 +249,18 @@ class ConnectionScreen(BaseScreen):
         install the required dependencies for bucket providers.
         """
         try:
-            import boto3
-            import botocore
+            import boto3  # type: ignore[import-untyped]
+            import botocore  # type: ignore[import-untyped]
 
             logger.info(
                 f"Boto3 version is {boto3.__version__}, botocore version is "
                 f"{botocore.__version__}"
             )
-        except Exception:
-            raise Exception(
+        except Exception as exception:
+            logger.exception(
+                "Failed to initialize bucket provider.", exc_info=exception
+            )
+            raise RuntimeError(
                 "Failed to initialize bucket provider. Try installing boto3."
             )
 
@@ -269,10 +276,10 @@ class ConnectionScreen(BaseScreen):
         from shovl.screens.bucket import BucketScreen
 
         if not isinstance(self.provider, BucketProvider):
-            raise Exception("Invalid provider type")
+            raise TypeError("Invalid provider type")
 
         self.dismiss_status_screen()
-        self.app.push_screen(
+        self.app.push_screen(  # type: ignore[reportUnknownMemberType]
             BucketScreen(
                 config=self.config,
                 connection=connection_config,
@@ -291,30 +298,30 @@ class ConnectionScreen(BaseScreen):
         seperate thread to avoid blocking the UI.
         """
         try:
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 self.push_status_screen, label="Connecting..."
             )
 
             if isinstance(connection_config, schemas.DatabaseConfig):
                 self.connect_to_database(connection_config=connection_config)
-            elif isinstance(connection_config, schemas.BucketConfig):
+            else:
                 self.connect_to_bucket(connection_config=connection_config)
 
-            self.app.call_from_thread(self.dismiss_status_screen)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
 
             if isinstance(connection_config, schemas.DatabaseConfig):
-                self.app.call_from_thread(
+                self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                     self.push_database_screen, connection_config
                 )
-            elif isinstance(connection_config, schemas.BucketConfig):
-                self.app.call_from_thread(
+            else:
+                self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                     self.push_bucket_screen, connection_config
                 )
         except Exception as exception:
             message = str(exception)
-            logger.exception(f"Connection failed: {message}")
-            self.app.call_from_thread(self.dismiss_status_screen)
-            self.app.call_from_thread(self.focus_view)
-            self.app.call_from_thread(
+            logger.exception("Connection failed.", exc_info=exception)
+            self.app.call_from_thread(self.dismiss_status_screen)  # type: ignore[reportUnknownMemberType]
+            self.app.call_from_thread(self.focus_view)  # type: ignore[reportUnknownMemberType]
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_error(f"Unable to connect: {message}")
             )

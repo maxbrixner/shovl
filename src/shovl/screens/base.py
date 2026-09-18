@@ -13,7 +13,7 @@ from .status import StatusScreen
 logger = logging.getLogger("shovl.screens.base")
 
 
-class BaseScreen(Screen):
+class BaseScreen(Screen[None]):
     """
     Base screen. Inherited by all other screens. Offers common functionality
     like status and filter handling.
@@ -59,7 +59,7 @@ class BaseScreen(Screen):
         """
         Start the filter worker showing the filter screen.
         """
-        self.run_in_thread(self.filter_worker, name="FilterWorker")
+        self.run_in_thread(target=self.filter_worker, name="FilterWorker")
 
     ### Callbacks ###
 
@@ -92,7 +92,7 @@ class BaseScreen(Screen):
         Notify the user of an error.
         """
         logger.debug(f"Notifying user of an error: {message}")
-        self.app.notify(
+        self.app.notify(  # type: ignore[reportUnknownMemberType]
             services.shorten_string(message, 200),
             title="Error",
             severity="error",
@@ -103,7 +103,7 @@ class BaseScreen(Screen):
         Notify the user of an informational message.
         """
         logger.debug(f"Notifying user of an informational message: {message}")
-        self.app.notify(
+        self.app.notify(  # type: ignore[reportUnknownMemberType]
             services.shorten_string(message, 200),
             title="Info",
             severity="information",
@@ -111,7 +111,7 @@ class BaseScreen(Screen):
 
     def run_in_thread(
         self,
-        target: Callable,
+        target: Callable[..., Any],
         name: str,
         *args: Any,
         **kwargs: Any,
@@ -121,7 +121,7 @@ class BaseScreen(Screen):
         screen while the thread is running.
         """
         if self.worker and self.worker.is_alive():
-            raise Exception("Worker is already running.")
+            raise RuntimeError("Worker is already running.")
 
         self.worker = threading.Thread(
             target=target, daemon=True, name=name, args=args, kwargs=kwargs
@@ -131,25 +131,25 @@ class BaseScreen(Screen):
     def push_status_screen(
         self,
         label: str | None = None,
-        abort_callback: Callable | None = None,
+        abort_callback: Callable[..., Any] | None = None,
     ) -> None:
         """
         Push the status screen.
         """
         if self.status_screen:
-            raise Exception("Status screen is already being shown.")
+            raise RuntimeError("Status screen is already being shown.")
 
         self.status_screen = StatusScreen(
             label=label, abort_callback=abort_callback
         )
-        self.app.push_screen(self.status_screen)
+        self.app.push_screen(self.status_screen)  # type: ignore[reportUnknownMemberType]
 
     def dismiss_status_screen(self) -> None:
         """
         Dismiss the status screen.
         """
         if self.status_screen:
-            self.status_screen.dismiss()
+            self.status_screen.dismiss()  # type: ignore[reportUnknownMemberType]
             self.status_screen = None
 
     def push_filter_screen(self) -> None:
@@ -157,7 +157,7 @@ class BaseScreen(Screen):
         Show the modal filter screen.
         """
         if self.filter_screen:
-            raise Exception("Filter screen is already being shown.")
+            raise RuntimeError("Filter screen is already being shown.")
 
         self.filter_changed_signal.clear()
         self.filter_closed_signal.clear()
@@ -169,14 +169,14 @@ class BaseScreen(Screen):
             confirm_callback=self.filter_closed_callback,
             cancel_callback=self.filter_closed_callback,
         )
-        self.app.push_screen(self.filter_screen)
+        self.app.push_screen(self.filter_screen)  # type: ignore[reportUnknownMemberType]
 
     def dismiss_filter_screen(self) -> None:
         """
         Dismiss the modal filter screen.
         """
         if self.filter_screen:
-            self.filter_screen.dismiss()
+            self.filter_screen.dismiss()  # type: ignore[reportUnknownMemberType]
             self.filter_screen = None
 
     def filter_view(self) -> None:
@@ -215,13 +215,13 @@ class BaseScreen(Screen):
         or cancelled.
         """
         try:
-            self.app.call_from_thread(self.push_filter_screen)
+            self.app.call_from_thread(self.push_filter_screen)  # type: ignore[reportUnknownMemberType]
 
             while True:
                 self.filter_changed_signal.wait()
 
                 self.filter_view()
-                self.app.call_from_thread(
+                self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                     self.refresh_view, show_truncated_hint=False
                 )
 
@@ -237,13 +237,13 @@ class BaseScreen(Screen):
 
                 self.filter_changed_signal.clear()
         except Exception as exception:
-            logger.exception(f"Error in filter worker: {exception}")
+            logger.exception("Error in filter worker.")
             message = str(exception)
-            self.app.call_from_thread(
+            self.app.call_from_thread(  # type: ignore[reportUnknownMemberType]
                 lambda: self.notify_error(
                     f"Unable to filter connections: {message}"
                 )
             )
 
-        self.app.call_from_thread(self.dismiss_filter_screen)
-        self.app.call_from_thread(self.focus_view)
+        self.app.call_from_thread(self.dismiss_filter_screen)  # type: ignore[reportUnknownMemberType]
+        self.app.call_from_thread(self.focus_view)  # type: ignore[reportUnknownMemberType]
