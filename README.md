@@ -105,7 +105,6 @@ A comprehensive list of available engine parameters can be found in the [SQLAlch
 
 | Database | Example | Common Engine Parameters |
 |----------|---------|-----------------|
-| SQLite   | `sqlite:///database.db` | |
 | PostgreSQL | `postgresql://user:password@localhost:5432/mydatabase` | `{"connect_args": {"sslmode": "require"}}` |
 | Oracle     | `oracle://user:password@localhost:1521/?service_name=myservice` | `{"thick_mode": true}` |
 
