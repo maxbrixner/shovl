@@ -297,7 +297,7 @@ shovl --help
 
 ## System Requirements
 
-- Python 3.12 or higher
+- Python 3.14 or higher
 - Terminal with Unicode support
 - Network connectivity for database and S3 operations
 
