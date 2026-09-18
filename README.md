@@ -33,8 +33,9 @@ Shovl uses a hierarchical configuration system to manage connection details and 
 
 1. Path specified via the `--config` command-line option
 2. Local configuration file (`.shovl` in the current directory)
-3. Global user configuration file (`~/.shovl` or `%USERPROFILE%\.shovl` on Windows)
-4. Default configuration (fallback)
+3. User configuration file (`~/.config/shovl/shovl` or `%USERPROFILE%\.config\shovl\shovl` on Windows)
+4. Global user configuration file (`~/.shovl` or `%USERPROFILE%\.shovl` on Windows)
+5. Default configuration (fallback)
 
 ### Generating Configuration Files
 

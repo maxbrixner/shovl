@@ -14,6 +14,7 @@ def get_configuration(
     """
     default_paths = [
         pathlib.Path(".shovl"),
+        pathlib.Path.home() / ".config" / "shovl" / "shovl",
         pathlib.Path.home() / pathlib.Path(".shovl"),
     ]
 
